@@ -53,15 +53,51 @@ class MainController extends Controller
     }
     public function printExercises()
     {
-        if(!session()->has('exercises')){
+        if (!session()->has('exercises')) {
             return redirect()->route('home');
         }
 
         $exercises = session('exercises');
+
+        echo '<pre>';
+        echo '<h1>Math Exercises (' . env('APP_Name') . ')</h1>';
+        echo '<hr>';
+
+        foreach ($exercises as $exercise) {
+            echo '<h2><small>' . $exercise['exercise_number'] . ' >> </small> ' . $exercise['exercise'] . '</h2>';
+        }
+        echo '<hr>';
+
+        echo '<small>Solutions</small><br>';
+        foreach ($exercises as $exercise) {
+            echo '<small>' . $exercise['exercise_number'] . ' >> ' . $exercise['solution'] . '</small><br>';
+        }
     }
     public function exportExercises()
     {
-        echo 'exportar exercicios para texto';
+        if (!session()->has('exercises')) {
+            return redirect()->route('home');
+        }
+
+        $exercises = session('exercises');
+
+        $filename = 'exercises_' . env('APP_NAME') . '_' . date('YmdHis') . '.txt';
+
+        $content = '';
+        foreach($exercises as $exercise){
+            $content .= $exercise['exercise_number'] . ' >> ' . $exercise['exercise'] . "\n";
+        }
+
+        $content .= "\n";
+        $content .= "Solutions\n";
+        foreach($exercises as $exercise){
+            $content .= $exercise['exercise_number'] . ' >> ' . $exercise['solution'] . "\n";
+        }
+
+        return response($content)
+            ->header('Content-Type', 'text/plain')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
     }
 
     private function generateExercise($i, $operations, $min, $max): array
@@ -101,7 +137,7 @@ class MainController extends Controller
 
         return [
             'operation' => $operation,
-            'exercise_number' => $i,
+            'exercise_number' => str_pad($i, 2, '0', STR_PAD_LEFT),
             'exercise' => $exercise,
             'solution' => "$exercise $solution"
         ];

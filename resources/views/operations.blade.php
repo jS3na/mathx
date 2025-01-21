@@ -12,7 +12,7 @@
         @foreach ($exercises as $exercise)
 
         <div class="col-3 display-6 mb-3">
-            <span class="badge bg-dark">{{ str_pad($exercise['exercise_number'], 2, '0', STR_PAD_LEFT) }}</span>
+            <span class="badge bg-dark">{{ $exercise['exercise_number'] }}</span>
             <span>{{ $exercise['exercise'] }}</span>
         </div>
 
